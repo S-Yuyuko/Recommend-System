@@ -1,0 +1,28 @@
+/* src/components/Header/GenresHeader.css */
+.genres-header {
+    display: flex;
+    overflow-x: auto;
+    padding: 10px 0;
+    background-color: #333;
+    color: #fff;
+    white-space: nowrap;
+}
+
+.genre-button {
+    background-color: #555;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    margin: 0 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    border-radius: 5px;
+}
+
+.genre-button.selected {
+    background-color: #007bff;
+}
+
+.genre-button:hover {
+    background-color: #777;
+}

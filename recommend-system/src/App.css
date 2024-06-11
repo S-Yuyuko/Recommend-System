@@ -1,54 +1,59 @@
 .App {
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  grid-template-columns: 1fr 300px;
-  grid-template-areas:
-    "header header"
-    "main right"
-    "footer footer";
+  display: flex;
   height: 100vh;
-  gap: 10px;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
 }
 
-header {
-  grid-area: header;
-  background: #282c34;
-  color: white;
-  padding: 20px;
-  text-align: center;
+.left-pane, .right-pane {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
+}
+
+.left-pane {
+  background: #f0f0f0;
+  position: relative;
+  min-width: 10%;
+}
+
+.right-pane {
+  background: #e0e0e0;
+  flex-grow: 1;
+}
+
+header, footer {
+  flex: 0 1 auto;
+  overflow: hidden;
 }
 
 main {
-  grid-area: main;
-  padding: 20px;
+  flex: 1 1 auto;
+  overflow-y: auto;
 }
 
-aside {
-  grid-area: right;
-  background: #f4f4f4;
-  padding: 20px;
+.resizer {
+  background: #ccc;
+  position: relative;
+  z-index: 1;
 }
 
-footer {
-  grid-area: footer;
-  background: #282c34;
-  color: white;
-  padding: 10px;
-  text-align: center;
+.resizer.vertical {
+  width: 5px;
+  cursor: ew-resize;
 }
 
-@media (max-width: 768px) {
-  .App {
-    grid-template-rows: auto 1fr auto auto;
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "header"
-      "main"
-      "right"
-      "footer";
-  }
+.resizer.horizontal {
+  height: 5px;
+  cursor: ns-resize;
+}
 
-  aside {
-    padding: 10px;
-  }
+.header {
+  overflow: hidden;
+}
+
+.footer {
+  overflow: hidden;
 }

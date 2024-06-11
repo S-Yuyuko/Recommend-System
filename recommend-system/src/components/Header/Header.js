@@ -1,6 +1,6 @@
 // src/components/Header/Header.js
 import React from 'react';
-import GenresHeader from './GenresHeader';
+import GenresHeader from './Genres/GenresHeader';
 import './Header.css';
 
 const Header = () => {

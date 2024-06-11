@@ -1,0 +1,22 @@
+/* src/components/Main/MovieCard.css */
+.movie-card {
+    padding: 15px;
+    background-color: #fff;
+    border: 1px solid #ddd;  /* Add border line */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.movie-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  /* Add shadow on hover */
+}
+
+.movie-card h3 {
+    margin: 0 0 10px;
+}
+
+.movie-card p {
+    margin: 5px 0;
+}

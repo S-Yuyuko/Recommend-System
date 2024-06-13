@@ -1,7 +1,13 @@
-/* src/components/Main/Main.css */
 .main {
     flex: 1;
     overflow-y: auto;
     padding: 20px;
     background-color: #fff;
+}
+
+.no-genres, .no-movies {
+    text-align: center;
+    font-size: 1.5em;
+    color: #999;
+    margin-top: 50px;
 }

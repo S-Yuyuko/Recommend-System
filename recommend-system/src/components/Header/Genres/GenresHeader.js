@@ -1,14 +1,9 @@
-// src/components/Header/GenresHeader.js
 import React, { useContext } from 'react';
 import { AppContext } from '../../../context/AppContext';
 import './GenresHeader.css';
 
-const genres = [
-    'Action', 'Comedy', 'Drama', 'Fantasy', 'Horror', 'Mystery', 'Romance', 'Thriller', 'Sci-Fi', 'Western'
-];
-
 const GenresHeader = () => {
-    const { selectedGenres, toggleGenre } = useContext(AppContext);
+    const { genres, selectedGenres, toggleGenre } = useContext(AppContext);
 
     return (
         <div className="genres-header">

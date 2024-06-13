@@ -1,69 +1,90 @@
-// src/context/AppContext.js
-import React, { createContext, useState, useRef } from 'react';
+import React, { createContext, useState, useEffect, useRef, useCallback } from 'react';
 
 export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-    // State for storing the sizes of different layout components
     const [sizes, setSizes] = useState({
-        leftWidth: '80%',    // Width of the left pane
-        rightWidth: '20%',   // Width of the right pane
-        headerHeight: '20%', // Height of the header section
-        mainHeight: '70%',   // Height of the main section
-        footerHeight: '10%', // Height of the footer section
+        leftWidth: '80%',
+        rightWidth: '20%',
+        headerHeight: '20%',
+        mainHeight: '70%',
+        footerHeight: '10%',
     });
 
-    // State for managing which component is being resized
     const [isResizing, setIsResizing] = useState(null);
-
-    // Reference to the container element
     const containerRef = useRef(null);
-
-    // State for storing the selected movie genres
+    const mainRef = useRef(null);
     const [selectedGenres, setSelectedGenres] = useState([]);
+    const [genres, setGenres] = useState([]);
+    const [movies, setMovies] = useState([]);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [isFetching, setIsFetching] = useState(false);
+    const [likedMovies, setLikedMovies] = useState([]); // State for liked movies
 
-    // List of movies
-    const [movies] = useState([
-        { id: 1, title: 'Inception', description: 'A mind-bending thriller', genres: ['Action', 'Sci-Fi', 'Thriller'] },
-        { id: 2, title: 'The Godfather', description: 'Crime drama', genres: ['Drama', 'Crime'] },
-        { id: 3, title: 'Pulp Fiction', description: 'Crime comedy', genres: ['Crime', 'Drama', 'Comedy'] },
-        { id: 4, title: 'The Dark Knight', description: 'Superhero action', genres: ['Action', 'Drama'] },
-        { id: 5, title: 'Forrest Gump', description: 'Drama and romance', genres: ['Drama', 'Romance'] },
-        { id: 6, title: 'Get Out', description: 'Horror thriller', genres: ['Horror', 'Mystery', 'Thriller'] },
-        { id: 7, title: 'The Matrix', description: 'Sci-Fi action', genres: ['Action', 'Sci-Fi'] },
-        { id: 8, title: 'The Shawshank Redemption', description: 'Drama', genres: ['Drama'] },
-        { id: 9, title: 'Titanic', description: 'Romantic drama', genres: ['Romance', 'Drama'] },
-        { id: 10, title: 'The Conjuring', description: 'Horror', genres: ['Horror', 'Mystery'] }
-    ]);
-
-    // Minimum size constraints for the resizable components
     const MIN_SIZES = {
-        leftWidth: 10,   // Minimum width of the left pane in percentage
-        rightWidth: 10,  // Minimum width of the right pane in percentage
-        headerHeight: 10, // Minimum height of the header section in percentage
-        mainHeight: 10,  // Minimum height of the main section in percentage
-        footerHeight: 10, // Minimum height of the footer section in percentage
+        leftWidth: 10,
+        rightWidth: 10,
+        headerHeight: 10,
+        mainHeight: 10,
+        footerHeight: 10,
     };
 
-    /**
-     * Function to handle the mouse down event for resizing.
-     * @param {string} element - The name of the element being resized.
-     */
+    useEffect(() => {
+        const fetchGenres = async () => {
+            try {
+                const response = await fetch('http://localhost:4000/genres');
+                const data = await response.json();
+                setGenres(Array.isArray(data) ? data : []);
+            } catch (error) {
+                console.error('Error fetching genres:', error);
+                setGenres([]);
+            }
+        };
+
+        fetchGenres();
+    }, []);
+
+    const fetchMovies = useCallback(async (page, reset = false) => {
+        try {
+            console.log(`Fetching movies with genres: ${selectedGenres}, page: ${page}`);
+            const response = await fetch('http://localhost:4000/movies', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ genres: selectedGenres.includes('ALL') ? [] : selectedGenres, page, limit: 24 }),
+            });
+            const data = await response.json();
+            if (reset) {
+                setMovies(data.movies || []); // Ensure movies is an array
+                setTotalPages(data.totalPages);
+            } else {
+                setMovies((prevMovies) => [...prevMovies, ...(data.movies || [])]); // Ensure movies is an array
+            }
+            setIsFetching(false);
+        } catch (error) {
+            console.error('Error fetching movies:', error);
+            setMovies([]); // Set to empty array on error
+            setIsFetching(false);
+        }
+    }, [selectedGenres]);
+
+    useEffect(() => {
+        if (selectedGenres.length > 0) {
+            fetchMovies(1, true);
+            setPage(1); // Reset page
+        }
+    }, [selectedGenres, fetchMovies]);
+
     const handleMouseDown = (element) => {
         setIsResizing(element);
     };
 
-    /**
-     * Function to handle the mouse up event to stop resizing.
-     */
     const handleMouseUp = () => {
         setIsResizing(null);
     };
 
-    /**
-     * Function to handle the mouse move event for resizing elements.
-     * @param {Object} e - The mouse event object.
-     */
     const handleMouseMove = (e) => {
         if (isResizing) {
             const bounds = containerRef.current.getBoundingClientRect();
@@ -83,32 +104,77 @@ export const AppProvider = ({ children }) => {
         }
     };
 
-    /**
-     * Function to toggle the selection of a genre.
-     * @param {string} genre - The genre to be toggled.
-     */
     const toggleGenre = (genre) => {
-        setSelectedGenres((prevSelectedGenres) =>
-            prevSelectedGenres.includes(genre)
-                ? prevSelectedGenres.filter((g) => g !== genre)
-                : [...prevSelectedGenres, genre]
+        if (genre === 'ALL') {
+            setSelectedGenres(['ALL']);
+        } else {
+            setSelectedGenres((prevSelectedGenres) => {
+                if (prevSelectedGenres.includes(genre)) {
+                    return prevSelectedGenres.filter((g) => g !== genre);
+                } else {
+                    return prevSelectedGenres.filter((g) => g !== 'ALL').concat(genre);
+                }
+            });
+        }
+        setMovies([]); // Clear displayed movies when genres change
+        setPage(1); // Reset page when genres change
+    };
+
+    const changePage = (newPage) => {
+        setPage(newPage);
+        fetchMovies(newPage, true);
+    };
+
+    const likeMovie = (movie) => {
+        setLikedMovies((prevLikedMovies) => {
+            if (prevLikedMovies.some(likedMovie => likedMovie.id === movie.id)) {
+                return prevLikedMovies;
+            }
+            return [...prevLikedMovies, { ...movie, score: 0 }];
+        });
+    };
+
+    const updateMovieScore = (id, score) => {
+        setLikedMovies((prevLikedMovies) =>
+            prevLikedMovies.map((movie) =>
+                movie.id === id ? { ...movie, score } : movie
+            )
+        );
+    };
+
+    const removeMovie = (id) => {
+        setLikedMovies((prevLikedMovies) =>
+            prevLikedMovies.filter((movie) => movie.id !== id)
         );
     };
 
     return (
         <AppContext.Provider
             value={{
-                sizes,              // Object storing the sizes of the layout components
-                handleMouseDown,    // Function to handle mouse down events for resizing
-                handleMouseUp,      // Function to handle mouse up events to stop resizing
-                handleMouseMove,    // Function to handle mouse move events for resizing
-                containerRef,       // Reference to the container element
-                selectedGenres,     // Array storing the selected movie genres
-                toggleGenre,        // Function to toggle the selection of a genre
-                movies              // Array of movie objects
+                sizes,
+                handleMouseDown,
+                handleMouseUp,
+                handleMouseMove,
+                containerRef,
+                mainRef,
+                selectedGenres,
+                toggleGenre,
+                genres,
+                movies,
+                page,
+                totalPages,
+                changePage,
+                isFetching,
+                setIsFetching,
+                likedMovies,
+                likeMovie, // Provide the likeMovie function to the context
+                updateMovieScore, // Provide the updateMovieScore function to the context
+                removeMovie, // Provide the removeMovie function to the context
             }}
         >
             {children}
         </AppContext.Provider>
     );
 };
+
+export default AppProvider;

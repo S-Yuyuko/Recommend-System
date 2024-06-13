@@ -1,0 +1,68 @@
+.right-pane {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-left: 1px solid #ccc;
+    height: 100%; /* Ensure the right pane takes the full height */
+    overflow-y: auto; /* Enable vertical scrolling if content overflows */
+}
+
+.right-pane h2 {
+    margin-bottom: 20px;
+}
+
+.liked-movies-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.movie-card {
+    position: relative; /* Added for positioning the cancel button */
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    min-width: 200px; /* Set minimum width */
+    min-height: 100px; /* Set minimum height */
+    overflow: hidden; /* Prevent overflow */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #222; /* Dark background for better contrast */
+    color: #fff; /* White text color */
+}
+
+.movie-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cancel-button {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #ff0000;
+}
+
+.cancel-button:hover {
+    color: #cc0000;
+}
+
+.movie-card h3 {
+    margin: 0;
+}
+
+.movie-card p {
+    margin: 0;
+}
+
+.movie-card .star-rating-container {
+    display: flex;
+    align-items: center;
+}
+
+.star-rating-container label {
+    margin-right: 10px;
+}

@@ -10,7 +10,7 @@ def load_movies(csv_file_path):
             reader = csv.DictReader(csvfile)
             for row in reader:
                 movies.append({
-                    'id': int(row['movieId']),
+                    'movieId': int(row['movieId']),
                     'title': row['title'],
                     'genres': row['genres'].split('|')
                 })
@@ -34,14 +34,20 @@ def paginate_movies(movies, page, limit):
 def main():
     try:
         csv_file_path = os.path.join(os.path.dirname(__file__), '../CSV/movies.csv')
-        genres = set(sys.argv[1:-2])  # Exclude the last two arguments for page and limit
-        page = int(sys.argv[-2])
-        limit = int(sys.argv[-1])
+        genres = set(json.loads(sys.argv[1]))  # Load genres from JSON argument
+        page = int(sys.argv[2])
+        limit = int(sys.argv[3])
 
         movies = load_movies(csv_file_path)
 
         if not genres:
-            print(json.dumps([]))
+            paginated_movies, total_movies = paginate_movies(movies, page, limit)
+            total_pages = (total_movies + limit - 1) // limit  # Calculate total pages
+            response = {
+                "movies": paginated_movies,
+                "totalPages": total_pages
+            }
+            print(json.dumps(response))
             return
 
         filtered_movies = filter_movies(movies, genres)

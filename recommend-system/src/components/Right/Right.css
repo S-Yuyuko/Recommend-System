@@ -3,6 +3,9 @@
     background-color: #f9f9f9;
     border-left: 1px solid #ccc;
     height: 100%; /* Ensure the right pane takes the full height */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Adjusted to remove extra spacing */
     overflow-y: auto; /* Enable vertical scrolling if content overflows */
 }
 
@@ -14,6 +17,7 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    flex-grow: 1; /* Allow the list to grow */
 }
 
 .movie-card {

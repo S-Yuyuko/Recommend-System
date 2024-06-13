@@ -75,7 +75,6 @@ app.post('/movies', (req, res) => {
     });
 });
 
-
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });

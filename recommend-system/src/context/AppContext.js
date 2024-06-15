@@ -127,25 +127,41 @@ export const AppProvider = ({ children }) => {
 
     const likeMovie = (movie) => {
         setLikedMovies((prevLikedMovies) => {
-            if (prevLikedMovies.some(likedMovie => likedMovie.id === movie.id)) {
+            if (prevLikedMovies.some(likedMovie => likedMovie.title === movie.title)) {
                 return prevLikedMovies;
             }
             return [...prevLikedMovies, { ...movie, score: 0 }];
         });
     };
 
-    const updateMovieScore = (id, score) => {
+    const updateMovieScore = (index, score) => {
         setLikedMovies((prevLikedMovies) =>
-            prevLikedMovies.map((movie) =>
-                movie.id === id ? { ...movie, score } : movie
+            prevLikedMovies.map((movie, idx) =>
+                idx === index ? { ...movie, score } : movie
             )
         );
     };
 
-    const removeMovie = (id) => {
+    const removeMovie = (index) => {
         setLikedMovies((prevLikedMovies) =>
-            prevLikedMovies.filter((movie) => movie.id !== id)
+            prevLikedMovies.filter((_, idx) => idx !== index)
         );
+    };
+
+    const submitLikedMovies = async () => {
+        try {
+            const response = await fetch('http://localhost:3000/recommend', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ likedMovies }),
+            });
+            const data = await response.json();
+            console.log('Recommendations:', data);
+        } catch (error) {
+            console.error('Error submitting liked movies:', error);
+        }
     };
 
     return (
@@ -170,6 +186,7 @@ export const AppProvider = ({ children }) => {
                 likeMovie, // Provide the likeMovie function to the context
                 updateMovieScore, // Provide the updateMovieScore function to the context
                 removeMovie, // Provide the removeMovie function to the context
+                submitLikedMovies, // Provide the submitLikedMovies function to the context
             }}
         >
             {children}

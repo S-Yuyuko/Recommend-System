@@ -150,7 +150,7 @@ export const AppProvider = ({ children }) => {
 
     const submitLikedMovies = async () => {
         try {
-            const response = await fetch('http://localhost:3000/recommend', {
+            const response = await fetch('http://localhost:4000/recommend', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

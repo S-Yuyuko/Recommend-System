@@ -27,7 +27,9 @@ const Right = () => {
                     </div>
                 ))}
             </div>
-            <button className="submit-button" onClick={submitLikedMovies}>Submit</button>
+            {likedMovies.length > 0 && (
+                <button className="submit-button" onClick={submitLikedMovies}>Submit</button>
+            )}
         </div>
     );
 };

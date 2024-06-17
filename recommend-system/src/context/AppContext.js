@@ -21,6 +21,8 @@ export const AppProvider = ({ children }) => {
     const [totalPages, setTotalPages] = useState(1);
     const [isFetching, setIsFetching] = useState(false);
     const [likedMovies, setLikedMovies] = useState([]); // State for liked movies
+    const [recommendations, setRecommendations] = useState([]);
+    const [showModal, setShowModal] = useState(false);
 
     const MIN_SIZES = {
         leftWidth: 10,
@@ -158,10 +160,15 @@ export const AppProvider = ({ children }) => {
                 body: JSON.stringify({ likedMovies }),
             });
             const data = await response.json();
-            console.log('Recommendations:', data);
+            setRecommendations(data);  // Store recommendations
+            setShowModal(true);  // Show modal
         } catch (error) {
             console.error('Error submitting liked movies:', error);
         }
+    };
+
+    const closeModal = () => {
+        setShowModal(false);
     };
 
     return (
@@ -187,6 +194,10 @@ export const AppProvider = ({ children }) => {
                 updateMovieScore, // Provide the updateMovieScore function to the context
                 removeMovie, // Provide the removeMovie function to the context
                 submitLikedMovies, // Provide the submitLikedMovies function to the context
+                submitLikedMovies,
+                recommendations,
+                showModal,
+                closeModal,
             }}
         >
             {children}
